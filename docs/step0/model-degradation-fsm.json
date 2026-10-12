@@ -1,0 +1,55 @@
+{
+  "_note": "inference-quantization 双门禁 + 有界降级链 状态机 —— logicprobe_verify 实测模型",
+  "_tool": "logicprobe_verify",
+  "_modelHash": "45f1a57a6d3703fd0c73955c3c7c85a948bdae35a66d3361e9e65bcac371485f",
+  "_result": {
+    "checksRun": 22,
+    "errors": 1,
+    "warnings": 156,
+    "passing": ["S1 可达性", "S2 无死锁", "S3 无有害闭环", "S4 确定性", "S6 守卫完备", "S7 不变式成立", "S8 单调性", "A2 无竞争", "A3 顺序无关", "A4 配对平衡", "A5 边界", "A6 资源", "A7 无反例", "A8 幂等重放", "A9 leads-to", "A10 序列", "A11 原子性", "A13 概率", "A14 截止"],
+    "error": "A12 budget：worst-case path cost 15 > 声明的 14 —— **是声明写小了，不是模型缺陷**（实测最长路径 = 15 步）",
+    "warningsDetail": "S5/A1 78 条 = (状态,事件) 未定义对；语义上等价'静默忽略'，实现契约要求显式返回错误码（见文档 §4）"
+  },
+  "schemaVersion": 1,
+  "init": "INGEST",
+  "states": [
+    { "id": "INGEST" },
+    { "id": "CALIB" },
+    { "id": "QUANTIZE" },
+    { "id": "EVAL_ACC" },
+    { "id": "EVAL_PERF" },
+    { "id": "GATE" },
+    { "id": "DEGRADE" },
+    { "id": "SIGNED", "terminal": true },
+    { "id": "ABORT", "terminal": true }
+  ],
+  "variables": [
+    { "name": "level", "kind": "integer", "init": 0, "min": 0, "max": 5, "monotonic": "inc" }
+  ],
+  "transitions": [
+    { "from": "INGEST", "event": "normalize_ok", "to": "CALIB" },
+    { "from": "INGEST", "event": "normalize_fail", "to": "ABORT" },
+    { "from": "CALIB", "event": "calib_ok", "to": "QUANTIZE" },
+    { "from": "CALIB", "event": "leak_detected", "to": "ABORT" },
+    { "from": "QUANTIZE", "event": "quant_ok", "to": "EVAL_ACC" },
+    { "from": "QUANTIZE", "event": "quant_fail", "guard": { "variable": "level", "op": "<", "value": 5 }, "to": "DEGRADE", "updates": [{ "variable": "level", "op": "inc" }] },
+    { "from": "QUANTIZE", "event": "quant_fail", "to": "ABORT" },
+    { "from": "EVAL_ACC", "event": "acc_pass", "to": "EVAL_PERF" },
+    { "from": "EVAL_ACC", "event": "acc_fail", "guard": { "variable": "level", "op": "<", "value": 5 }, "to": "DEGRADE", "updates": [{ "variable": "level", "op": "inc" }] },
+    { "from": "EVAL_ACC", "event": "acc_fail", "to": "ABORT" },
+    { "from": "EVAL_PERF", "event": "perf_pass", "to": "GATE" },
+    { "from": "EVAL_PERF", "event": "perf_fail", "guard": { "variable": "level", "op": "<", "value": 5 }, "to": "DEGRADE", "updates": [{ "variable": "level", "op": "inc" }] },
+    { "from": "EVAL_PERF", "event": "perf_fail", "to": "ABORT" },
+    { "from": "GATE", "event": "both_pass", "to": "SIGNED" },
+    { "from": "GATE", "event": "not_pass", "guard": { "variable": "level", "op": "<", "value": 5 }, "to": "DEGRADE", "updates": [{ "variable": "level", "op": "inc" }] },
+    { "from": "GATE", "event": "not_pass", "to": "ABORT" },
+    { "from": "DEGRADE", "event": "next_method", "to": "QUANTIZE" }
+  ],
+  "invariants": [
+    { "id": "INV-LEVEL-BOUND", "description": "降级层级不超过声明上限 5（题目要求降级链有界）", "kind": "var-in-range", "variable": "level", "min": 0, "max": 5 },
+    { "id": "INV-ACC-GATE", "description": "精度门禁独立：签收前必须经过 acc_pass，量化不得自签精度", "kind": "event-before-state", "event": "acc_pass", "state": "SIGNED" },
+    { "id": "INV-PERF-GATE", "description": "性能门禁：签收前必须经过 perf_pass", "kind": "event-before-state", "event": "perf_pass", "state": "SIGNED" },
+    { "id": "INV-LEAK-GATE", "description": "去泄漏：进入量化前必须已过 calib_ok（leak_detected 直接中止）", "kind": "event-before-state", "event": "calib_ok", "state": "QUANTIZE" },
+    { "id": "INV-BUDGET", "description": "[初版写小了] 从受理到终态的可达路径不超过 14 步；实测最长 15 步", "kind": "budget", "budget": 14 }
+  ]
+}

@@ -1,0 +1,80 @@
+# 能力清单（安全声明）—— inference-quantization
+#
+# 语义：本清单是**白名单**。未声明的 capability 与未列出的 resource 一律拒绝
+# （E_CAPABILITY_DENIED / E_RESOURCE_NOT_DECLARED，见 src/capability.mjs）。
+#
+# 风险档沿用 inference-serving 已固化的定义（同一台机器、同一套资产规则）：
+#   read   = R0 只读，无沙箱要求
+#   write  = R1/R2 写操作，需沙箱（本机 R1 不可用 → 实际按 R2 容器级执行）
+#   system = R4 系统级，需 VM 级沙箱 —— 本机无 VM 沙箱，故一律拒绝
+
+name: inference-quantization
+version: 0.1.0
+interface:
+  mcp: "1.0.0"
+  cli: "1.0.0"
+
+capabilities:
+  - id: quantize
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [model:read, gpu:write, disk:write, state:write, network:egress]
+  - id: validate
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [model:read, gpu:write, disk:write, state:write, network:egress]
+  - id: get_report
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: list
+    risk: read
+    sandbox: none
+    idempotent: true
+    resources: [state:read]
+  - id: rollback
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [disk:write, state:write]
+  - id: qat_plan
+    risk: write
+    sandbox: none
+    idempotent: true
+    resources: [state:write, model:read]
+  - id: dataset_prepare
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [network:egress, disk:write, state:write]
+  - id: image_verify
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [network:egress, disk:write, state:write]
+  - id: image_build
+    risk: write
+    sandbox: container
+    idempotent: true
+    resources: [network:egress, disk:write, state:write]
+
+# 显式声明「本插件不提供」的能力，让审计能区分「未声明所以拒绝」与「设计上不做」
+not_provided:
+  - id: qat_execute
+    risk: system
+    reason: QAT 是训练（写新权重、小时级），落 R3 → 需 VM 级沙箱 → 本机不可用。本插件只产出 QAT 计划并停下等裁决，不执行训练。
+  - id: modify_source_model
+    risk: system
+    reason: 原始模型只读（题目追加原则）；产出必须写到独立目录，且量化前后做哈希校验。
+  - id: disable_leakage_gate
+    risk: system
+    reason: 校准集与测试集的内容哈希交集必须为空。这是硬门禁，不接受人工确认放行。
+  - id: sudo_exec
+    risk: system
+    reason: 提权被显式禁止。
+  - id: install_driver
+    risk: system
+    reason: 修改宿主驱动/内核参数属系统级变更，不在本插件职责内。

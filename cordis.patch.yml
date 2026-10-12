@@ -1,0 +1,12 @@
+# Bundle patch for inference-quantization.
+#
+# 与 serving 同样的两条硬约束（本机实测踩过）：
+#   - name 必须是 npm 包名，不能写相对路径（相对路径会以 PROFILE 目录为 baseUrl 解析 → 启动失败）
+#   - inject 必须显式声明；host 组合没有 preset 式的自动注入
+#
+# 只硬依赖 tools；webServer 是可选取用（headless profile 也能挂载）。
+- insert:
+    - id: inference-quantization
+      name: 'inference-quantization'
+      inject:
+        - tools

@@ -1,0 +1,52 @@
+# inference-quantization 量化工具链镜像
+#
+# 设计约束（用户裁决 #4）：
+#   ① 可复现：固定 base image digest + 固定依赖版本
+#   ② 构建日志落盘（由 scripts/build-image.mjs 负责）
+#   ③ 漏洞扫描（由 scripts/build-image.mjs 调用扫描器）
+#   ④ 签名（docker trust / cosign，由构建脚本负责）
+#
+# 为什么不复用 vllm/vllm-openai:nightly 直接跑量化：
+#   llmcompressor 要求 transformers>=5.15，而该镜像是 5.12.1。
+#   在那个镜像里升级 transformers 会动到 vLLM 的钉版 —— 所以必须派生一个**独立镜像**，
+#   让量化环境与推理环境彻底解耦（推理镜像保持原样供 inference-serving 使用）。
+#
+# 为什么以 vllm 镜像为 base 而不是 nvidia/cuda：
+#   它已经有 aarch64 上编译好的 torch 2.11 + CUDA 13 运行时 + triton，
+#   从零装这些在 aarch64 上要么很慢要么缺 wheel。
+ARG BASE_IMAGE=vllm/vllm-openai:nightly
+
+FROM ${BASE_IMAGE}
+
+# 国内 pip 镜像（本机实测：pypi.org 元数据可达但 wheel CDN 不稳定；aliyun 镜像同步滞后）
+ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple/
+ENV PIP_TRUSTED_HOST=pypi.tuna.tsinghua.edu.cn
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+
+# 模型/数据集下载走镜像站（huggingface.co 在本机不可达）
+ENV HF_ENDPOINT=https://hf-mirror.com
+ENV HF_HUB_DISABLE_TELEMETRY=1
+
+# 关闭 tokenizers 并行（避免容器内 fork 风暴）
+ENV TOKENIZERS_PARALLELISM=false
+
+LABEL org.opencontainers.image.title="inference-quantization-toolchain"
+LABEL org.opencontainers.image.description="llmcompressor PTQ/AWQ toolchain, aarch64-safe (pure-python quantizers)"
+LABEL org.opencontainers.image.source="inference-quantization"
+
+# 精确钉版：任何漂移都会让"同一输入产出同一模型"的承诺失效
+RUN python3 -m pip install \
+      "llmcompressor==0.14.0" \
+      "compressed-tensors==0.19.0" \
+      "transformers==5.17.0" \
+      "datasets==5.0.1" \
+      "accelerate==1.15.0" \
+      "auto-round==0.15.1" \
+ && python3 -c "import llmcompressor, compressed_tensors, transformers, datasets; print('QTOOLCHAIN_OK', llmcompressor.__version__, compressed_tensors.__version__, transformers.__version__, datasets.__version__)"
+
+# 构建期自检：量化路径的关键模块必须可导入（缺了就早失败，别等跑一半）
+RUN python3 -c "from llmcompressor.modifiers.transform.awq import AWQModifier; print('AWQ_MODIFIER_OK')" \
+ && python3 -c "from llmcompressor.modifiers.quantization import QuantizationModifier; print('QUANT_MODIFIER_OK')"
+
+WORKDIR /workspace
