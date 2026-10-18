@@ -17,6 +17,7 @@
  *   node scripts/retro-mark-invalid.mjs            # 只报告（零写入）
  *   node scripts/retro-mark-invalid.mjs --apply    # 真写
  */
+import os from 'node:os'
 import { createRuntime } from '../src/config.mjs'
 import { withMatrix, findRun, markRunInvalid, isRunInvalid } from '../src/state/matrix.mjs'
 
@@ -39,7 +40,7 @@ export const KNOWN_INVALID_RUNS = Object.freeze([
   },
 ])
 
-export async function retroMark({ root = '/home/xiciyang/.ai-infra', apply = false } = {}) {
+export async function retroMark({ root = process.env.AI_INFRA_ROOT || os.homedir() + '/.ai-infra', apply = false } = {}) {
   const runtime = await createRuntime({ root, options: {} })
   const report = { apply, marked: [], alreadyMarked: [], notFound: [], runsScanned: 0 }
 

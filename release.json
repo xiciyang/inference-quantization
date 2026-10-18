@@ -1,0 +1,20 @@
+{
+ "lists": [
+  {
+   "repo": "0xsline/awesome-deepseek-harness",
+   "category": "Models & Inference",
+   "file": "README.md",
+   "fileZh": "README.zh-CN.md",
+   "summary": "Quantize a checkpoint and prove it still passes: content-hash de-leaked dataset preparation, AWQ/INT4 via llm-compressor inside a container, accuracy comparison on a fixed eval set, and an explicit failure verdict instead of a silent regression.",
+   "entry": "- [xiciyang/inference-quantization](https://github.com/xiciyang/inference-quantization) - Quantize a checkpoint and prove it still passes: content-hash de-leaked dataset prep, AWQ/INT4 via llm-compressor inside a container, accuracy comparison against a fixed eval set, and an explicit failure verdict instead of a silent regression; declares `dsh.bundle.patch` and `engines.dsh`, verified on DSH 0.2.0-rc.2 (146 tests).\\n",
+   "entryZh": "- [xiciyang/inference-quantization](https://github.com/xiciyang/inference-quantization) - 量化一个 checkpoint 并证明它仍然达标：内容哈希去泄漏的数据集准备、容器内 AWQ/INT4（llm-compressor）、固定评测集精度对比，失败时给明确结论而不是静默退化；声明 `dsh.bundle.patch` 与 `engines.dsh`，已在 DSH 0.2.0-rc.2 验证（146 项测试）。\\n"
+  },
+  {
+   "repo": "walkinglabs/awesome-deepseek-harness-plugins",
+   "category": "Tools, Integrations & Automation",
+   "file": "README.md",
+   "summary": "Quantization with a verdict: prepare a de-leaked dataset, run AWQ/INT4 in a container with the source checkpoint mounted read-only, compare accuracy against a fixed eval set, and fail loudly when the tolerance is missed.",
+   "entry": "- [inference-quantization](https://github.com/xiciyang/inference-quantization) - Quantization with a verdict: de-leaked dataset preparation, AWQ/INT4 via llm-compressor in a container (source checkpoint mounted read-only), accuracy comparison against a fixed eval set, and an explicit failure when the tolerance is missed; declares `dsh.bundle.patch` plus `engines.dsh`, verified against DSH 0.2.0-rc.2 (146 tests).\\n"
+  }
+ ]
+}

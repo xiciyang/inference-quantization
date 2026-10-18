@@ -67,7 +67,7 @@ $ npm view @ai-infra/state-core  version     →（空）
 $ npm view @ai-infra/audit-core  version     →（空）
 $ npm view @ai-infra/sandbox-core version    →（空）
 $ ls ~/.dsh/profiles/web/node_modules/@ai-infra    → No such file or directory
-$ ls -d /home/xiciyang/deepseek_harness/ai-infra*  →（空）
+$ ls -d $HOME/deepseek_harness/ai-infra*  →（空）
 ```
 
 **结论**：五个共享库**一个都不存在**。按题面"若不存在，内置最小实现，接口按契约设计"，量化插件将：
@@ -179,9 +179,9 @@ llmcompressor/modifiers/transform/awq/{__init__,base,dynamic_mappings,mappings}.
 
 ```
 /data/datasets           不存在        /datasets                 不存在
-/home/xiciyang/datasets  不存在        hf_cache/datasets         不存在
+$HOME/datasets  不存在        hf_cache/datasets         不存在
 /data/models/hf_cache, ms_cache  内无任何 dataset
-/home/xiciyang/deepseek_harness 下唯一的 .jsonl 是 inference-serving 自己的审计样本
+$HOME/deepseek_harness 下唯一的 .jsonl 是 inference-serving 自己的审计样本
 ```
 
 `[verified]` 可获取的候选（容器内实测 hf-mirror API 全部 200）：
