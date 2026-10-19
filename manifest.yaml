@@ -8,7 +8,7 @@
 #   write  = R1/R2 写操作，需沙箱（本机 R1 不可用 → 实际按 R2 容器级执行）
 #   system = R4 系统级，需 VM 级沙箱 —— 本机无 VM 沙箱，故一律拒绝
 
-name: inference-quantization
+name: "@xiciyang/inference-quantization"
 version: 0.1.0
 interface:
   mcp: "1.0.0"

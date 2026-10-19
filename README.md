@@ -30,7 +30,7 @@ failure when the image is missing — it never silently "passes").
 ```bash
 dsh plugin --profile <name> add github:xiciyang/inference-quantization
 # or, from this repo:
-npm pack && npm install -g ./inference-quantization-0.1.0.tgz
+npm pack && npm install -g ./xiciyang-inference-quantization-0.1.0.tgz
 ```
 
 给模型 + 精度容忍 + 性能目标，**量化它并证明它达标** —— 或者给你一个明确的失败结论。
@@ -81,9 +81,9 @@ npm pack && npm install -g ./inference-quantization-0.1.0.tgz
 ## 安装
 
 ```bash
-npm install -g inference-quantization
+npm install -g @xiciyang/inference-quantization
 # 或（本机 npm 官方源不可达时的推荐通道）
-npm pack && npm install -g ./inference-quantization-0.1.0.tgz
+npm pack && npm install -g ./xiciyang-inference-quantization-0.1.0.tgz
 ```
 
 作为 **DSH 插件**：`dsh plugin --profile web add <tgz>`，重启后生效。

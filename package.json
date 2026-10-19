@@ -1,5 +1,5 @@
 {
-  "name": "inference-quantization",
+  "name": "@xiciyang/inference-quantization",
   "version": "0.1.0",
   "description": "Quantize a model checkpoint and prove it: choose a method (default AWQ+INT4), PTQ-calibrate with a leak-free split, pass an independent accuracy gate and a performance gate through real serving endpoints, auto-degrade on failure, and sign off or roll back — fully audited.",
   "type": "module",

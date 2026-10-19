@@ -7,6 +7,6 @@
 # 只硬依赖 tools；webServer 是可选取用（headless profile 也能挂载）。
 - insert:
     - id: inference-quantization
-      name: 'inference-quantization'
+      name: '@xiciyang/inference-quantization'
       inject:
         - tools
