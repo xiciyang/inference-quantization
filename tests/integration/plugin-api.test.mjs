@@ -25,7 +25,7 @@ function mockCtx({ withWebServer = true, failOn = null } = {}) {
 }
 
 test('契约: 导出 name / inject / apply，只硬依赖 tools', () => {
-  assert.equal(name, 'inference-quantization')
+  assert.equal(name, '@xiciyang/inference-quantization')
   assert.deepEqual(inject, ['tools'], 'webServer 必须可选（headless profile 也要能挂载）')
   assert.equal(typeof apply, 'function')
 })

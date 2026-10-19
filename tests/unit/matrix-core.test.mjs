@@ -90,7 +90,7 @@ test('错误: 量化专项错误码齐全且格式统一', () => {
 
 test('版本: package.json / src/version.mjs / manifest.yaml 三处一致', () => {
   const pkg = JSON.parse(readFileSync(join(PACKAGE_ROOT, 'package.json'), 'utf8'))
-  assert.equal(pkg.name, 'inference-quantization')
+  assert.equal(pkg.name, '@xiciyang/inference-quantization')
   assert.equal(pkg.version, PACKAGE_VERSION)
   const mf = parseYaml(readFileSync(join(PACKAGE_ROOT, 'manifest.yaml'), 'utf8'))
   assert.equal(mf.version, PACKAGE_VERSION)

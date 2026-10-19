@@ -17,7 +17,7 @@ import { allMethods } from './backends/index.mjs'
 import { readImageMeta } from './image.mjs'
 import { PACKAGE_VERSION, MCP_INTERFACE_VERSION } from './version.mjs'
 
-export const name = 'inference-quantization'
+export const name = '@xiciyang/inference-quantization'
 export const inject = ['tools']
 
 const ALLOWED_CONFIG_KEYS = new Set([
