@@ -81,10 +81,12 @@ npm pack && npm install -g ./xiciyang-inference-quantization-0.1.0.tgz
 ## 安装
 
 ```bash
-npm install -g @xiciyang/inference-quantization
-# 或（本机 npm 官方源不可达时的推荐通道）
-npm pack && npm install -g ./xiciyang-inference-quantization-0.1.0.tgz
+git clone https://github.com/xiciyang/inference-quantization.git
+cd inference-quantization && npm pack
+dsh plugin --profile <name> add ./xiciyang-inference-quantization-0.1.0.tgz
 ```
+
+> 尚未发布到 npm（`npm install -g` 暂不可用）；用上面的源码打包路径安装。
 
 作为 **DSH 插件**：`dsh plugin --profile web add <tgz>`，重启后生效。
 
