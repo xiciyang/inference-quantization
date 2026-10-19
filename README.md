@@ -20,8 +20,10 @@ two gates exist for. Source-model structure preflight (`E_SOURCE_MODEL_INVALID`)
 - Every run writes a hash-chained audit trail
 
 **Not a fit if** you just want `llmcompressor` or AutoAWQ recipes — those do the quantization; this
-is the proof layer around it (gates, degradation, audit, rollback). It also needs a GPU and Docker
-for the real path; `npm test` runs without either.
+is the proof layer around it (gates, degradation, audit, rollback).
+
+The real path needs a GPU, Docker and the quantizer image (`E_METHOD_UNAVAILABLE` is the explicit
+failure when the image is missing — it never silently "passes").
 
 ## Install (DSH plugin / CLI)
 
