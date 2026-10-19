@@ -7,5 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '24' }
-      - name: Unit and integration tests
-        run: npm test
+      # 集成测试需要 GPU + 容器 + nvidia runtime，GitHub 托管 runner 上不具备；
+      # 这里只跑单元测试，集成测试由有 GPU 的机器执行（见 README「兼容与门禁」）。
+      - name: Unit tests
+        run: npm run test:unit

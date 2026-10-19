@@ -299,7 +299,11 @@ MIT
 | 运行时依赖 | 零（只用 Node 内建模块）；量化在容器内完成 |
 | 后端 | Docker / Podman + `llmcompressor` 镜像 |
 
-跨包契约套件（`inference-contracts`）属于本机 monorepo 的内部闸门：单独 clone 本仓库时
+测试分层：`npm run test:unit` 在**无 GPU** 的 CI（GitHub 托管 runner）上运行；
+`npm run test:integration` 需要 GPU + 容器 + nvidia runtime —— 条件不满足时显式报
+`E_METHOD_UNAVAILABLE`，不会静默跳过。本机实测 146/146。
+
+跨包契约套件（`inference-contracts`）属于 monorepo 的内部闸门：单独 clone 本仓库时
 `npm run test:contract` 会明确跳过，不会伪装成通过。
 
 ## 许可
