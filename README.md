@@ -1,5 +1,36 @@
 # inference-quantization
 
+**Quantize a model and prove it — or get an explicit failure.** Give it a checkpoint, an accuracy
+tolerance and a performance target; it runs PTQ (default AWQ + INT4 via llmcompressor) inside a
+container, then applies two independent gates:
+
+- **Accuracy gate** — perplexity delta on a leakage-free split (content-hash intersection of
+  calibration and test sets must be empty; there is no manual override).
+- **Measurement-validity gate** — is the number even meaningful? Uniform output, no discriminating
+  power, input-independent results, unhealthy weights and "never scored" all fail with
+  `E_MEASUREMENT_INVALID` instead of being reported as "0% loss".
+
+A downloaded-but-truncated model once quantized for 436 s and got signed off as "zero accuracy loss"
+because its output was uniform and both perplexities were bit-identical. That is the incident these
+two gates exist for. Source-model structure preflight (`E_SOURCE_MODEL_INVALID`) is the other half.
+
+- Zero runtime dependencies, Node built-ins only
+- Source model mounted read-only, hashes re-checked after quantization
+- Bounded degradation: INT4 → INT8 → FP8 → W8A16 → (QAT plan only, no training)
+- Every run writes a hash-chained audit trail
+
+**Not a fit if** you just want `llmcompressor` or AutoAWQ recipes — those do the quantization; this
+is the proof layer around it (gates, degradation, audit, rollback). It also needs a GPU and Docker
+for the real path; `npm test` runs without either.
+
+## Install (DSH plugin / CLI)
+
+```bash
+dsh plugin --profile <name> add github:xiciyang/inference-quantization
+# or, from this repo:
+npm pack && npm install -g ./inference-quantization-0.1.0.tgz
+```
+
 给模型 + 精度容忍 + 性能目标，**量化它并证明它达标** —— 或者给你一个明确的失败结论。
 
 ```
