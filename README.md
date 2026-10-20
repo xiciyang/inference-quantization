@@ -101,7 +101,7 @@ dsh plugin --profile <name> add ./xiciyang-inference-quantization-0.1.0.tgz
 ```bash
 inference-quantization doctor                     # 环境 / 方法 / 镜像 / 沙箱 / 契约 自检
 inference-quantization image verify --build       # 量化镜像验证（依赖清单 + 漏洞扫描 + 签名 + digest）
-inference-quantization quantize /data/models/Qwen2.5-1.5B-Instruct \
+inference-quantization quantize /path/to/models/<model> \
     --max-accuracy-drop-pct 5 --min-perf-gain-pct 20
 inference-quantization list --json                # 量化矩阵
 inference-quantization report <runId>             # 完整报告

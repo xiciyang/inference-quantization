@@ -31,7 +31,7 @@ export const KNOWN_INVALID_RUNS = Object.freeze([
     reason: '源模型残缺（ms_cache 副本 338 张量中 223 个整块为零，含 model.norm.weight），'
       + '输出退化为均匀分布；其 accuracy.dropPct=0 / ppl=151935.97(=vocab_size) / status=verified 均不可作为验收证据',
     evidence: {
-      sourceModel: '/data/models/ms_cache/models/Qwen--Qwen2.5-1.5B-Instruct/snapshots/master',
+      sourceModel: '<MODELS_DIR>/ms_cache/.../Qwen2.5-1.5B-Instruct/snapshots/master',
       uniformOutputSignature: 'ppl == vocab_size == 151936（exp(11.93121445743442)）',
       replacedBy: 'qr_45e79f22f441（完好源模型上重跑，dropPct=19.571%，measurementValid=true）',
       voidDeclaredIn: ['DEPLOYMENT_REPORT.md §五', 'ACCEPTANCE_MATRIX.md FIX-3'],

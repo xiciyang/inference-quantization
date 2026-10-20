@@ -38,7 +38,7 @@ export const TOOL_SPECS = [
     parameters: {
       type: 'object', additionalProperties: false,
       properties: {
-        model: { type: 'string', description: '模型：本地路径（/data/models/xxx）、模型 ID、或环境变量 env:VAR。量化需要本地 checkpoint。' },
+        model: { type: 'string', description: '模型：本地路径（/path/to/models/<model>）、模型 ID、或环境变量 env:VAR。量化需要本地 checkpoint。' },
         path: { type: 'string', description: '显式指定本地模型目录。' },
         method: { type: 'string', description: '量化方法 id。默认 awq-w4a16；可选 int8-w8a8 / fp8-dynamic / w8a16。' },
         max_accuracy_drop_pct: ACCURACY_DROP,

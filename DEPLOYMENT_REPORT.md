@@ -70,7 +70,7 @@
 
 | 项 | 值 |
 |---|---|
-| 命令 | `quantize /data/models/Qwen2.5-1.5B-Instruct-verified --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --allow-unverified-image` |
+| 命令 | `quantize /path/to/models/<model> --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --allow-unverified-image` |
 | 结果 | `ok=true signed=true outcome=gated`，门禁判定 `sign`，`measurementValid=true` |
 | 总耗时 | **733.6 s**（其中量化 410.6 s —— 校准集 512 条，比上一版的 128 条多 4 倍） |
 | 方法 | `awq-w4a16`（L1，默认档），**未降级** |
@@ -146,7 +146,7 @@ L1:awq-w4a16(E_QUANTIZE_FAILED) → L2:int8-w8a8(E_QUANTIZE_FAILED)
 逐层取证后，根因是：
 
 > **打分脚本是对的，模型文件是坏的。**
-> 源模型 `/data/models/Qwen2.5-1.5B-Instruct`（软链 → `ms_cache/.../snapshots/master`）的
+> 源模型 `/path/to/models/<model>`（软链 → `ms_cache/.../snapshots/master`）的
 > `model.safetensors` 只有前 **0.747 GiB** 是真实权重，其后 **2.128 GiB 全是 `0x00`**
 > —— 一次**下载中断**留下的空洞（同目录还留着 `model.safetensors.download.aria2`）。
 > 338 个张量里 **223 个整块为零**，**包括 `model.norm.weight`**（最终 RMSNorm 的缩放权重）。
@@ -252,7 +252,7 @@ config 声明层数 vs 权重实际层数、`index.json` 分片齐备性。
 
 ### 5.5 在完好模型上重跑（`量化专项 1`）
 
-`runId = qr_45e79f22f441`，源模型 `/data/models/Qwen2.5-1.5B-Instruct-verified`
+`runId = qr_45e79f22f441`，源模型 `/path/to/models/<model>`
 （sha256 `dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee`）。
 
 | 项 | 值 |
@@ -281,11 +281,11 @@ config 声明层数 vs 权重实际层数、`index.json` 分片齐备性。
 - **没有**修复或重下 `ms_cache` 里那份残缺文件，**也没有**改 `Qwen2.5-1.5B-Instruct` 这个软链
   —— 它是本次事故的现场证据，我无权替你销毁。
 - 重跑用的是完好副本 `hf_cache/.../8b1c83b87f53a...` 复制到
-  `/data/models/Qwen2.5-1.5B-Instruct-verified`（不覆写任何既有目录）。
+  `/path/to/models/<model>`（不覆写任何既有目录）。
 - **建议你手工做一件事**（一行，可随时撤销）：
   ```bash
   # 方案 A：让规范路径重新指向完好副本
-  ln -sfn /data/models/Qwen2.5-1.5B-Instruct-verified /data/models/Qwen2.5-1.5B-Instruct
+  ln -sfn /path/to/models/<model> /path/to/models/<model>
   # 方案 B：重新完整下载，修好 ms_cache 本身
   modelscope download --model Qwen/Qwen2.5-1.5B-Instruct
   ```
@@ -321,7 +321,7 @@ node bin/inference-quantization.mjs list --json     # 量化矩阵（五要素 +
 真机端到端（需 GPU + Docker + 已构建的量化镜像，约 8–15 分钟）：
 
 ```bash
-node scripts/e2e-demo.mjs --model /data/models/Qwen2.5-1.5B-Instruct-verified \
+node scripts/e2e-demo.mjs --model /path/to/models/<model> \
     --accuracy-drop 50 --perf-gain 0 --calibration-samples 128
 ```
 
@@ -329,11 +329,11 @@ node scripts/e2e-demo.mjs --model /data/models/Qwen2.5-1.5B-Instruct-verified \
 
 ```bash
 # 残缺副本 → 2.6 s 内 E_SOURCE_MODEL_INVALID，点名 223 个零张量
-node bin/inference-quantization.mjs quantize /data/models/Qwen2.5-1.5B-Instruct \
+node bin/inference-quantization.mjs quantize /path/to/models/<model> \
     --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --allow-unverified-image --json
 
 # 完好副本 → 预检通过并进入量化
-node bin/inference-quantization.mjs quantize /data/models/Qwen2.5-1.5B-Instruct-verified \
+node bin/inference-quantization.mjs quantize /path/to/models/<model> \
     --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --allow-unverified-image --json
 ```
 

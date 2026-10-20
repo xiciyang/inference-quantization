@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — inference-quantization 前置调研（Step 0）
 
 > 性质：**只读探测**。未创建 `inference-quantization/` 包骨架、未安装任何宿主机包、未修改任何既有文件。
-> 时间：2026-09-23　主机：`thinkstationpgx-3269`（aarch64 / NVIDIA GB10）
+> 时间：2026-09-23　主机：`<host>`（aarch64 / NVIDIA GB10）
 > 前置：`inference-serving` v0.1.0 已交付（见 `ACCEPTANCE_MATRIX.md`）
 > 证据等级：`[verified]` = 本机命令/文件一手结果（附命令）；`[claimed]` = 二手口径；`[inferred]` = 推论（写明依据）
 
@@ -17,7 +17,7 @@
 | ② | 量化工具链"可用/不可用" | 三个镜像里**都没有** `llmcompressor` / `autoawq` / `gptqmodel`；vllm 镜像有 `compressed_tensors 0.17.0` + `bitsandbytes`，sglang 镜像有 `compressed_tensors 0.18.0` + `datasets` + `modelopt 0.45/0.46` + `torchao` | 必须**自建量化镜像**；且不能装进 serving 用的 vllm 镜像（见 ③） |
 | ③ | （未提及）装进现有镜像即可 | `llmcompressor` 要求 `transformers>=5.15.0`，而 vllm/sglang 镜像都是 **5.12.1** → pip 会把 transformers 升到 5.17.0，**可能弄坏 vLLM 的钉版** | 量化必须在**独立镜像/环境**里跑，与推理镜像解耦（这也正好符合"软硬件解耦 + 资源隔离"） |
 | ④ | （未提及）pip 直连即可 | `pypi.org` 的**元数据**可达，但 wheel CDN `files.pythonhosted.org` **实测不可达/不稳定**（`Network is unreachable`）；`mirrors.aliyun.com` 的 pip 镜像**没有** llmcompressor 0.14.0（同步滞后） | **必须走 TUNA 镜像**：`https://pypi.tuna.tsinghua.edu.cn/simple/` 实测**成功下载** llmcompressor wheel。这一条要写进本插件的网络策略 |
-| ⑤ | 校准数据从验证集切分 | **本机没有任何数据集**：无 `/data/datasets`，HF/MS 缓存里无 dataset，工作区只有一个我们自己的 demo 产物 `.jsonl` | "校准集与测试集无交集"这条门禁**必须建立在下载来的数据集上**，其血缘（来源 URL + revision + 切分种子 + 内容哈希）要落盘才可验证 |
+| ⑤ | 校准数据从验证集切分 | **本机没有任何数据集**：无本地数据集目录，HF/MS 缓存里无 dataset，工作区只有一个我们自己的 demo 产物 `.jsonl` | "校准集与测试集无交集"这条门禁**必须建立在下载来的数据集上**，其血缘（来源 URL + revision + 切分种子 + 内容哈希）要落盘才可验证 |
 
 ---
 
@@ -178,9 +178,9 @@ llmcompressor/modifiers/transform/awq/{__init__,base,dynamic_mappings,mappings}.
 `[verified]` 本机现状：
 
 ```
-/data/datasets           不存在        /datasets                 不存在
+<DATA_DIR>              不存在        /datasets                 不存在
 $HOME/datasets  不存在        hf_cache/datasets         不存在
-/data/models/hf_cache, ms_cache  内无任何 dataset
+`<MODELS_DIR>/hf_cache`、`<MODELS_DIR>/ms_cache` 内无任何 dataset
 $HOME/deepseek_harness 下唯一的 .jsonl 是 inference-serving 自己的审计样本
 ```
 

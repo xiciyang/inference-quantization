@@ -12,7 +12,7 @@ description: 当需要把模型量化并证明它达标时使用（给定精度�
 ```bash
 inference-quantization doctor                                   # 环境/方法/镜像/契约自检
 inference-quantization image verify --build                     # 量化镜像验证（扫描+签名+依赖+可复现）
-inference-quantization quantize /data/models/Qwen2.5-1.5B-Instruct \
+inference-quantization quantize /path/to/models/<model> \
     --max-accuracy-drop-pct 5 --min-perf-gain-pct 20
 ```
 

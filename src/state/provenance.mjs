@@ -6,7 +6,7 @@
  * 量化产物（`~/.ai-infra/quantized/<name>/`）里只有**量化配方**（`recipe.yaml`），
  * **没有来源模型信息**。而 serving 只按产物路径查 license：
  *
- *   - 基座 `/data/models/Qwen2.5-1.5B-Instruct-verified` → 无 LICENSE 文件 → `unknown`
+ *   - 基座 `/path/to/models/<model>` → 无 LICENSE 文件 → `unknown`
  *     → 人工确认一次（`lic_109655b7c0c4cc00`）
  *   - 派生 `~/.ai-infra/quantized/...-awq-w4a16` → 同样无 LICENSE → **又是** `unknown`
  *     → **再要求人工确认一次**（`lic_231e62b4935bd42a`，真机审计 seq 14 实测）

@@ -401,7 +401,7 @@ function printHelp(stream = process.stdout) {
   stream.write(`\n${C.bold('示例')}\n`)
   stream.write(`  inference-quantization doctor\n`)
   stream.write(`  inference-quantization image verify --build\n`)
-  stream.write(`  inference-quantization quantize /data/models/Qwen2.5-1.5B-Instruct \\\n`)
+  stream.write(`  inference-quantization quantize /path/to/models/<model> \\\n`)
   stream.write(`      --max-accuracy-drop-pct 5 --min-perf-gain-pct 20\n`)
   stream.write(`  inference-quantization list --json\n`)
   stream.write(`  inference-quantization report <runId>\n`)

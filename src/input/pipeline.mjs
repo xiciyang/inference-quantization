@@ -68,7 +68,7 @@ export function normalizeInput(raw) {
 export function validateCandidates(candidates) {
   if (candidates.length === 0) {
     fail(ERROR_CODES.E_INPUT_MISSING, '没有提供任何模型输入', {
-      remediation: '请提供：本地路径（/data/models/xxx）、模型 ID（org/name 或目录名）、env:VAR、或一句模糊描述（会列出候选）。',
+      remediation: '请提供：本地路径（/path/to/models/<model>）、模型 ID（org/name 或目录名）、env:VAR、或一句模糊描述（会列出候选）。',
       details: { accepted: ['path', 'model', 'modelId', 'env:VAR', 'fuzzyDescription'] },
     })
   }
@@ -209,7 +209,7 @@ export async function runInputPipeline(runtime, raw, { log = null, skipHash = fa
   }
   if (resolved.needsDownload) {
     fail(ERROR_CODES.E_MODEL_UNRESOLVED, '量化需要本地 checkpoint，不支持直接从远端 URL 量化', {
-      remediation: '先把模型下到本地模型根目录（如 /data/models），再对本地路径量化。',
+      remediation: '先把模型下到本地模型根目录（如 /path/to/models），再对本地路径量化。',
       details: { downloadPlan: resolved.downloadPlan },
     })
   }

@@ -25,7 +25,7 @@ ms_cache/.../model.safetensors   338 个张量中 223 个整块为零（2.145 GB
    五条独立否证（无评分 / 权重健康度 / 均匀输出签名 / 基线与候选逐位相同 / 逐条极差为 0）。
    `status=verified` 现在需要**数值达标 ∧ 决策 sign ∧ 测量成立**三条同时成立。
 
-**重跑结果**（`runId=qr_45e79f22f441`，源模型 `/data/models/Qwen2.5-1.5B-Instruct-verified`）
+**重跑结果**（`runId=qr_45e79f22f441`，源模型 `/path/to/models/<model>`）
 
 | 项 | 值 |
 |---|---|
@@ -47,7 +47,7 @@ ms_cache/.../model.safetensors   338 个张量中 223 个整块为零（2.145 GB
 
 | # | 要求 | 证据 | 判定 |
 |---|---|---|---|
-| **A1** | 正常量化：给定模型，1 条命令完成量化并通过门禁 | `D` 真机：`inference-quantization quantize /data/models/Qwen2.5-1.5B-Instruct --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --calibration-samples 128 --allow-unverified-image` → `ok=true signed=true outcome=gated`，耗时 **436s**，`runId=qr_25b26474a21b` | ✅ |
+| **A1** | 正常量化：给定模型，1 条命令完成量化并通过门禁 | `D` 真机：`inference-quantization quantize /path/to/models/<model> --max-accuracy-drop-pct 50 --min-perf-gain-pct 0 --calibration-samples 128 --allow-unverified-image` → `ok=true signed=true outcome=gated`，耗时 **436s**，`runId=qr_25b26474a21b` | ✅ |
 | **A2** | 自动降级：失败时至少尝试 3 种方法 | `T` `quantize-loop.test.mjs`「量化本身失败也会降级」：L1/L2 注入失败 → 在 L3 成功；「L1 精度不达标自动降到 L2 并成功」。`D` 真机另一次运行实测 **L1→L2→L3→L4 四级全试过**（chain 见 DEPLOYMENT_REPORT §4.2） | ✅ |
 | **A3** | 幂等：同源+同方法+同切分 → 同一 runKey | `T`「同源+同方法+同切分 → 同一 runKey」断言两次调用的 `runKey` 相同（runKey = sha256(源+方法+校准切分指纹)） | ✅ |
 | **A4** | 回退：`rollback` 可用且不触碰源模型 | `T` `plugin-api.test.mjs`「rollback 无目标时明确报错」+ 确认闸门验证；`D` 演示脚本含回退步骤。`A` `src/api.mjs` rollback 实现只改矩阵状态、可选删产出目录，且经 `assertOutputDirSafe` 校验 | ✅ |
